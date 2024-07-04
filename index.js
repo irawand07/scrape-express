@@ -17,16 +17,19 @@ app.get('/antam', async (req, res) => {
     // Load the HTML into cheerio
     const $ = cheerio.load(data);
 
+    const date = $('.hero-price p').first().text();
+
     // Example: Extract the title of the page
     const currentPrice = $('.current').html();
     
     // send notification
-    const urlBot = "https://api.telegram.org/bot" + process.env.BOT_TOKEN + "/sendMessage?chat_id=" + process.env.BOT_CHAT_ID + "&text=" + currentPrice ;
+    const message = date.trim().replace('Perubahan terakhir: ', '') + " => " + currentPrice.replace('Harga/gram ', '');
+    const urlBot = "https://api.telegram.org/bot" + process.env.BOT_TOKEN + "/sendMessage?chat_id=" + process.env.BOT_CHAT_ID + "&text=" + message ;
     const response = await axios.get(urlBot);
 
     // Respond with the extracted data
     res.json({
-      price: currentPrice,
+      message: message,
       bot: response.data.ok
     });
   } catch (error) {
